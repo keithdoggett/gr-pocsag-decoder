@@ -1,0 +1,11 @@
+.vscode/
+
+python/*.pyc
+
+# data files
+pocsag_data/
+demod_sample
+pocsag_bits*
+POCSAG_IQ.wav
+pocsag.aup
+sliced_demod.wav
