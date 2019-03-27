@@ -5,7 +5,7 @@ import binascii
 from pocsag_batch import PocsagBatch
 from pocsag_frame import PocsagIdleFrame, PocsagMessageWord, PocsagAddressWord
 from pocsag_message import PocsagMessage
-FILE_NAME = "./pocsag_bits_other"
+FILE_NAME = "./pocsag_bits"
 PREAMBLE = "10"*288
 
 
@@ -105,7 +105,7 @@ def parse_batches(batches):
         for frame in batch.frames:
             for codeword in frame.codewords:
                 flattened_codewords.append(codeword)
-                print type(codeword)
+                # print type(codeword)
 
     messages = []
     curr_message = None

@@ -69,6 +69,24 @@ class PocsagCodeWord(object):
         self.word = word
         self.bch_check = word[21:31]
         self.parity = word[31]
+        self.valid = self._is_valid()
+
+    def _is_valid(self):
+        """
+            Method to perform a BCH check on the codeword
+
+            Uses parity bit to check validity
+            Even parity bit means that the total # of 1s should be even
+
+            returns:
+                (bool) - result of even parity check
+        """
+        is_valid = self.word.count("1") % 2 == 0
+        if is_valid:
+            return True
+        else:
+            print "invalid", self.word, self.word.count("1"), self.parity
+            return False
 
     def get_data(self):
         raise NotImplementedError(
