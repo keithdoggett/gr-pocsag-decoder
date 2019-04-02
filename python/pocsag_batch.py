@@ -64,3 +64,16 @@ class PocsagBatch(object):
             self.frames.append(frame)
             idx += 64
             frame_pos += 1
+
+
+def contains_fsc(bits):
+    """
+        Function to determine if a bitstring contains the fsc
+        at the beginning
+
+        args:
+            bits - (str) of the bits
+        returns:
+            (bool) of whether it has the fsc at the beginning
+    """
+    return bits[0:32] == FRAME_SYNC_CODE

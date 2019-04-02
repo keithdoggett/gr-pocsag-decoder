@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Pocsag Demod
-# Generated: Wed Mar 27 08:56:27 2019
+# Generated: Tue Apr  2 09:34:57 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -71,8 +71,10 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
+        self.udp_port = udp_port = 5125
         self.symbol_rate = symbol_rate = 1200
         self.samp_rate = samp_rate = 1.8e6
+        self.ip_addr = ip_addr = "127.0.0.1"
         self.fsk_deviation_hz = fsk_deviation_hz = 2.5e3
         self.center_freq = center_freq = 152.180e6
 
@@ -229,6 +231,8 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         	1, samp_rate, 38e3, 18e3, firdes.WIN_HAMMING, 6.76))
         self.digital_clock_recovery_mm_xx_0 = digital.clock_recovery_mm_ff(samp_rate/symbol_rate*(1+0.0), 0.01, 0, 0.1, 0.01)
         self.digital_binary_slicer_fb_0 = digital.binary_slicer_fb()
+        self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_char*1472, ip_addr, udp_port, 1472, True)
+        self.blocks_stream_to_vector_0 = blocks.stream_to_vector(gr.sizeof_char*1, 1472)
         self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, '/home/keith/Workspace/gnuradio_projects/pocsag/pocsag_bits', False)
         self.blocks_file_sink_0.set_unbuffered(False)
         self.analog_quadrature_demod_cf_0 = analog.quadrature_demod_cf(samp_rate/(2*math.pi*fsk_deviation_hz/8.0))
@@ -238,7 +242,9 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         ##################################################
         self.connect((self.analog_quadrature_demod_cf_0, 0), (self.digital_clock_recovery_mm_xx_0, 0))
         self.connect((self.analog_quadrature_demod_cf_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.blocks_stream_to_vector_0, 0), (self.blocks_udp_sink_0, 0))
         self.connect((self.digital_binary_slicer_fb_0, 0), (self.blocks_file_sink_0, 0))
+        self.connect((self.digital_binary_slicer_fb_0, 0), (self.blocks_stream_to_vector_0, 0))
         self.connect((self.digital_clock_recovery_mm_xx_0, 0), (self.digital_binary_slicer_fb_0, 0))
         self.connect((self.low_pass_filter_0, 0), (self.analog_quadrature_demod_cf_0, 0))
         self.connect((self.low_pass_filter_0, 0), (self.qtgui_const_sink_x_0, 0))
@@ -249,6 +255,12 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         self.settings = Qt.QSettings("GNU Radio", "pocsag_demod")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
+
+    def get_udp_port(self):
+        return self.udp_port
+
+    def set_udp_port(self, udp_port):
+        self.udp_port = udp_port
 
     def get_symbol_rate(self):
         return self.symbol_rate
@@ -269,6 +281,12 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 38e3, 18e3, firdes.WIN_HAMMING, 6.76))
         self.digital_clock_recovery_mm_xx_0.set_omega(self.samp_rate/self.symbol_rate*(1+0.0))
         self.analog_quadrature_demod_cf_0.set_gain(self.samp_rate/(2*math.pi*self.fsk_deviation_hz/8.0))
+
+    def get_ip_addr(self):
+        return self.ip_addr
+
+    def set_ip_addr(self, ip_addr):
+        self.ip_addr = ip_addr
 
     def get_fsk_deviation_hz(self):
         return self.fsk_deviation_hz
