@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Pocsag Demod
-# Generated: Tue Apr  2 09:34:57 2019
+# Generated: Thu Apr 11 09:49:24 2019
 ##################################################
 
 from distutils.version import StrictVersion
@@ -233,8 +233,6 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         self.digital_binary_slicer_fb_0 = digital.binary_slicer_fb()
         self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_char*1472, ip_addr, udp_port, 1472, True)
         self.blocks_stream_to_vector_0 = blocks.stream_to_vector(gr.sizeof_char*1, 1472)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, '/home/keith/Workspace/gnuradio_projects/pocsag/pocsag_bits', False)
-        self.blocks_file_sink_0.set_unbuffered(False)
         self.analog_quadrature_demod_cf_0 = analog.quadrature_demod_cf(samp_rate/(2*math.pi*fsk_deviation_hz/8.0))
 
         ##################################################
@@ -243,7 +241,6 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         self.connect((self.analog_quadrature_demod_cf_0, 0), (self.digital_clock_recovery_mm_xx_0, 0))
         self.connect((self.analog_quadrature_demod_cf_0, 0), (self.qtgui_time_sink_x_0, 0))
         self.connect((self.blocks_stream_to_vector_0, 0), (self.blocks_udp_sink_0, 0))
-        self.connect((self.digital_binary_slicer_fb_0, 0), (self.blocks_file_sink_0, 0))
         self.connect((self.digital_binary_slicer_fb_0, 0), (self.blocks_stream_to_vector_0, 0))
         self.connect((self.digital_clock_recovery_mm_xx_0, 0), (self.digital_binary_slicer_fb_0, 0))
         self.connect((self.low_pass_filter_0, 0), (self.analog_quadrature_demod_cf_0, 0))
