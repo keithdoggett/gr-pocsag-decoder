@@ -72,7 +72,7 @@ After configuring the GRC flow graph, click the run button to get it going. It w
 To start the decoder, just use the following command:
 
 ```sh
-python pyton/pocsag_reader.py
+python python/pocsag_reader.py
 ```
 
 The messages and other debugging information will be displayed in the console.
