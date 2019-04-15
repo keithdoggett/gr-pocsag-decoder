@@ -4,7 +4,6 @@
     Includes a class for the actual frame
     as well as classes for the 2 codewords in each frame
 """
-import abc
 IDLE_FRAME_CODE = "01111010100010011100000110010111"
 
 

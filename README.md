@@ -6,8 +6,6 @@ GNU Radio program and Python module to demodulate and decode POCSAG signals. The
 
 The motivation behind this project is to demonstrate 2 things. First being that the devices we use to talk everyday aren't (completely) magic. Second being that when using these devices we have to consider the security implications and know that what we send through them may not be private.
 
-> Side note: I'm currently working on a project to estimate the amount of HIPPA violations sent through unsecured POCSAG channels (it's a lot).
-
 ![](./imgs/gr-pocsag-demod.png)
 
 ## Setup
@@ -82,6 +80,7 @@ The messages and other debugging information will be displayed in the console.
 - Replace `print` statements with `logging.log` statements to make it compatible across Python2 and Python3.
 - Add command line arguments (logging level, udp socket or file source, port and ip address, ASCII or BCD output, output to file or console).
 - Add support for other encoding types (Manchester encoding, etc).
+- Add support for error correcting on BCH codes.
 - Turn Python module into OOT module for GNU Radio?
 - Multithreading on the Python module to guarantee we won't miss a packet sent from GRC (hasn't been an issue yet, but it's definitely a possibility).
 - Add reference docs to README.
