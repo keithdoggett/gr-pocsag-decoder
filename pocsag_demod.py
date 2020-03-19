@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Pocsag Demod
-# Generated: Mon Apr 15 08:44:09 2019
+# Generated: Wed Mar 18 16:31:45 2020
 ##################################################
 
 from distutils.version import StrictVersion
@@ -72,10 +72,13 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.udp_port = udp_port = 5125
+        self.symbol_rate_2 = symbol_rate_2 = 1200
         self.symbol_rate = symbol_rate = 1200
         self.samp_rate = samp_rate = 1.8e6
         self.ip_addr = ip_addr = "127.0.0.1"
         self.fsk_deviation_hz = fsk_deviation_hz = 2.5e3
+        self.decimation = decimation = 10
+        self.center_freq_2 = center_freq_2 = 158.103e6
         self.center_freq = center_freq = 152.180e6
 
         ##################################################
@@ -95,6 +98,8 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         self.rtlsdr_source_0.set_antenna('', 0)
         self.rtlsdr_source_0.set_bandwidth(samp_rate/2, 0)
 
+        self.root_raised_cosine_filter_0 = filter.fir_filter_fff(1, firdes.root_raised_cosine(
+        	1, samp_rate/decimation, symbol_rate, 0.35, 45))
         self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
         	1024, #size
         	samp_rate, #samp_rate
@@ -227,9 +232,8 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
 
         self._qtgui_const_sink_x_0_win = sip.wrapinstance(self.qtgui_const_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_const_sink_x_0_win)
-        self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(
-        	1, samp_rate, 38e3, 18e3, firdes.WIN_HAMMING, 6.76))
-        self.digital_clock_recovery_mm_xx_0 = digital.clock_recovery_mm_ff(samp_rate/symbol_rate*(1+0.0), 0.01, 0, 0.1, 0.01)
+        self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(decimation, (firdes.low_pass(5, samp_rate, fsk_deviation_hz,fsk_deviation_hz*2)), 0, samp_rate)
+        self.digital_clock_recovery_mm_xx_0 = digital.clock_recovery_mm_ff(samp_rate/(decimation*symbol_rate)*(1+0.0), 0.01, 0, 0.1, 0.01)
         self.digital_binary_slicer_fb_0 = digital.binary_slicer_fb()
         self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_char*1472, ip_addr, udp_port, 1472, True)
         self.blocks_stream_to_vector_0 = blocks.stream_to_vector(gr.sizeof_char*1, 1472)
@@ -238,15 +242,16 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_quadrature_demod_cf_0, 0), (self.digital_clock_recovery_mm_xx_0, 0))
         self.connect((self.analog_quadrature_demod_cf_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.analog_quadrature_demod_cf_0, 0), (self.root_raised_cosine_filter_0, 0))
         self.connect((self.blocks_stream_to_vector_0, 0), (self.blocks_udp_sink_0, 0))
         self.connect((self.digital_binary_slicer_fb_0, 0), (self.blocks_stream_to_vector_0, 0))
         self.connect((self.digital_clock_recovery_mm_xx_0, 0), (self.digital_binary_slicer_fb_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.analog_quadrature_demod_cf_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.qtgui_const_sink_x_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.qtgui_freq_sink_x_1, 0))
-        self.connect((self.rtlsdr_source_0, 0), (self.low_pass_filter_0, 0))
+        self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.analog_quadrature_demod_cf_0, 0))
+        self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.qtgui_const_sink_x_0, 0))
+        self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.qtgui_freq_sink_x_1, 0))
+        self.connect((self.root_raised_cosine_filter_0, 0), (self.digital_clock_recovery_mm_xx_0, 0))
+        self.connect((self.rtlsdr_source_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "pocsag_demod")
@@ -259,12 +264,19 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
     def set_udp_port(self, udp_port):
         self.udp_port = udp_port
 
+    def get_symbol_rate_2(self):
+        return self.symbol_rate_2
+
+    def set_symbol_rate_2(self, symbol_rate_2):
+        self.symbol_rate_2 = symbol_rate_2
+
     def get_symbol_rate(self):
         return self.symbol_rate
 
     def set_symbol_rate(self, symbol_rate):
         self.symbol_rate = symbol_rate
-        self.digital_clock_recovery_mm_xx_0.set_omega(self.samp_rate/self.symbol_rate*(1+0.0))
+        self.root_raised_cosine_filter_0.set_taps(firdes.root_raised_cosine(1, self.samp_rate/self.decimation, self.symbol_rate, 0.35, 45))
+        self.digital_clock_recovery_mm_xx_0.set_omega(self.samp_rate/(self.decimation*self.symbol_rate)*(1+0.0))
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -273,10 +285,11 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate
         self.rtlsdr_source_0.set_sample_rate(self.samp_rate)
         self.rtlsdr_source_0.set_bandwidth(self.samp_rate/2, 0)
+        self.root_raised_cosine_filter_0.set_taps(firdes.root_raised_cosine(1, self.samp_rate/self.decimation, self.symbol_rate, 0.35, 45))
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
         self.qtgui_freq_sink_x_1.set_frequency_range(0, self.samp_rate)
-        self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 38e3, 18e3, firdes.WIN_HAMMING, 6.76))
-        self.digital_clock_recovery_mm_xx_0.set_omega(self.samp_rate/self.symbol_rate*(1+0.0))
+        self.freq_xlating_fir_filter_xxx_0.set_taps((firdes.low_pass(5, self.samp_rate, self.fsk_deviation_hz,self.fsk_deviation_hz*2)))
+        self.digital_clock_recovery_mm_xx_0.set_omega(self.samp_rate/(self.decimation*self.symbol_rate)*(1+0.0))
         self.analog_quadrature_demod_cf_0.set_gain(self.samp_rate/(2*math.pi*self.fsk_deviation_hz/8.0))
 
     def get_ip_addr(self):
@@ -290,7 +303,22 @@ class pocsag_demod(gr.top_block, Qt.QWidget):
 
     def set_fsk_deviation_hz(self, fsk_deviation_hz):
         self.fsk_deviation_hz = fsk_deviation_hz
+        self.freq_xlating_fir_filter_xxx_0.set_taps((firdes.low_pass(5, self.samp_rate, self.fsk_deviation_hz,self.fsk_deviation_hz*2)))
         self.analog_quadrature_demod_cf_0.set_gain(self.samp_rate/(2*math.pi*self.fsk_deviation_hz/8.0))
+
+    def get_decimation(self):
+        return self.decimation
+
+    def set_decimation(self, decimation):
+        self.decimation = decimation
+        self.root_raised_cosine_filter_0.set_taps(firdes.root_raised_cosine(1, self.samp_rate/self.decimation, self.symbol_rate, 0.35, 45))
+        self.digital_clock_recovery_mm_xx_0.set_omega(self.samp_rate/(self.decimation*self.symbol_rate)*(1+0.0))
+
+    def get_center_freq_2(self):
+        return self.center_freq_2
+
+    def set_center_freq_2(self, center_freq_2):
+        self.center_freq_2 = center_freq_2
 
     def get_center_freq(self):
         return self.center_freq
